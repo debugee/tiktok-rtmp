@@ -1,0 +1,307 @@
+{
+    "version": 10,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 31,
+        "patch": 0
+      },
+    "configurePresets": [
+        {
+            "name": "cmake",
+            "hidden": true,
+            "description": "cmake setting",
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            }
+        },
+        {
+            "name": "ninja",
+            "hidden": true,
+            "generator": "Ninja"
+        },
+        {
+            "name": "nmake",
+            "hidden": true,
+            "generator": "NMake Makefiles"
+        },
+        {
+            "name": "windows-only",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "macos-only",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        },
+        {
+            "name": "vs-only",
+            "hidden": true,
+            "inherits":[
+                "windows-only"
+            ],
+            "environment": {
+                "DOTNET_CLI_UI_LANGUAGE":"en-US"
+            },
+            "generator": "Visual Studio 17 2022"
+        },
+        {
+            "name": "windows-mingw",
+            "hidden": true,
+            "inherits":[
+                "windows-only"
+            ],
+            "environment": {
+                "PATH":"$penv{PATH};C:/llvm-mingw-20240619-ucrt-x86_64/bin"
+            },
+            "generator": "MinGW Makefiles"
+        },
+        {
+            "name": "macos-mingw",
+            "hidden": true,
+            "inherits":[
+                "macos-only"
+            ],
+            "generator": "Unix Makefiles",
+            "environment": {
+                "PATH":"$penv{PATH}:/Users/admin/Downloads/llvm-mingw-20240619-ucrt-macos-universal/bin"
+            }
+        },
+        {
+            "name": "vcpkg",
+            "hidden": true,
+            "description": "vcpkg env",
+            "cacheVariables": {
+                "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+            }
+        },
+        {
+            "name": "qt_msvc",
+            "hidden": true,
+            "description": "qt msvc env",
+            "inherits":[
+                "windows-only"
+            ],
+            "binaryDir": "${sourceParentDir}/build",
+            "cacheVariables": {
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.7.3/msvc2022_64"
+            }
+        },
+        {
+            "name": "qt_llvm_mingw",
+            "hidden": true,
+            "description": "qt llvm_mingw env",
+            "binaryDir": "${sourceParentDir}/build",
+            "cacheVariables": {
+                "CMAKE_PREFIX_PATH": "C:/Qt/6.7.3/llvm-mingw_64"
+            }
+        },
+        {
+            "name": "qt_vcpkg",
+            "hidden": true,
+            "binaryDir": "${sourceParentDir}/build",
+            "description": "qt_vcpkg",
+            "inherits":[
+                "vcpkg"
+            ]
+        },
+        {
+            "name": "debug",
+            "hidden": true,
+            "description": "debug",
+            "inherits": [
+                "cmake"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release",
+            "hidden": true,
+            "description": "release",
+            "inherits": [
+                "cmake"
+            ],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "platform-Win32",
+            "hidden": true,
+            "inherits":[
+                "vs-only"
+            ],
+            "architecture":{
+                "strategy": "set",
+                "value": "Win32,version=10.0"
+            }
+        },
+        {
+            "name": "platform-x64",
+            "hidden": true,
+            "inherits":[
+                "vs-only"
+            ],
+            "architecture":{
+                "strategy": "set",
+                "value": "x64,version=10.0"
+            }
+        },
+        {
+            "name": "toolset-x86",
+            "hidden": true,
+            "inherits":[
+                "vs-only"
+            ],
+            "toolset":{
+                "strategy": "set",
+                "value": "v143,host=x86"
+            }
+        },
+        {
+            "name": "toolset-x64",
+            "hidden": true,
+            "inherits":[
+                "vs-only"
+            ],
+            "toolset":{
+                "strategy": "set",
+                "value": "v143,host=x64"
+            }
+        },
+        {
+            "name": "vs-x64",
+            "inherits":[
+                "cmake",
+                "toolset-x64",
+                "qt_msvc",
+                "platform-x64"
+            ]
+        },
+        {
+            "name": "debug_mingw_cross_compile",
+            "inherits":[
+                "debug",
+                "macos-mingw",
+                "qt_vcpkg"
+            ],
+            "cacheVariables": {
+                "CMAKE_SYSTEM_NAME": "Windows",
+                "VCPKG_TARGET_TRIPLET": "x64-mingw-static",
+                "CMAKE_C_COMPILER": "x86_64-w64-mingw32-clang",
+                "CMAKE_CXX_COMPILER": "x86_64-w64-mingw32-clang++",
+                "CMAKE_C_COMPILER_TARGET":"x86_64-w64-mingw32",
+                "CMAKE_CXX_COMPILER_TARGET":"x86_64-w64-mingw32"
+            }
+        },
+        {
+            "name": "release_mingw_cross_compile",
+            "inherits":[
+                "release",
+                "macos-mingw",
+                "qt_vcpkg"
+            ],
+            "cacheVariables": {
+                "CMAKE_SYSTEM_NAME": "Windows",
+                "VCPKG_TARGET_TRIPLET": "x64-mingw-static",
+                "CMAKE_C_COMPILER": "x86_64-w64-mingw32-clang",
+                "CMAKE_CXX_COMPILER": "x86_64-w64-mingw32-clang++",
+                "CMAKE_C_COMPILER_TARGET":"x86_64-w64-mingw32",
+                "CMAKE_CXX_COMPILER_TARGET":"x86_64-w64-mingw32"
+            }
+        },
+        {
+            "name": "debug-mingw",
+            "inherits":[
+                "debug",
+                "windows-mingw",
+                "qt_llvm_mingw"
+            ]
+        },
+        {
+            "name": "release-mingw",
+            "inherits":[
+                "release",
+                "windows-mingw",
+                "qt_llvm_mingw"
+            ]
+        },
+        {
+            "name": "msvc-nmake-debug-x64",
+            "inherits":[
+                "debug",
+                "nmake",
+                "qt_msvc"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            }
+        },
+        {
+            "name": "msvc-nmake-release-x64",
+            "inherits":[
+                "release",
+                "nmake",
+                "qt_msvc"
+            ],
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl",
+                "CMAKE_CXX_COMPILER": "cl"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "vs-debug-x64",
+            "configurePreset": "vs-x64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "vs-release-x64",
+            "configurePreset": "vs-x64",
+            "configuration": "Release"
+        },
+        {
+            "name": "debug-mingw",
+            "configurePreset": "debug-mingw",
+            "configuration": "Debug"
+        },
+        {
+            "name": "release-mingw",
+            "configurePreset": "release-mingw",
+            "configuration": "Release"
+        },
+        {
+            "name": "msvc-nmake-debug-x64",
+            "configurePreset": "msvc-nmake-debug-x64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "msvc-nmake-release-x64",
+            "configurePreset": "msvc-nmake-release-x64",
+            "configuration": "Release"
+        },
+        {
+            "name": "debug_mingw_cross_compile",
+            "configurePreset": "debug_mingw_cross_compile",
+            "configuration": "Debug"
+        },
+        {
+            "name": "release_mingw_cross_compile",
+            "configurePreset": "release_mingw_cross_compile",
+            "configuration": "Release"
+        }
+    ]
+
+}

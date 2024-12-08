@@ -1,0 +1,6 @@
+{
+    "dependencies": [
+        "qtbase",
+        "qttools"
+    ]
+}
