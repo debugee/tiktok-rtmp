@@ -13,9 +13,6 @@ ULONG GetParentProcessID(ULONG dwId);
 
 string g_p_BaseThreadInitThunk_Opcode;
 string g_p_LdrLoadDll_Opcode;
-string g_p_DbgUiRemoteBreakin_Opcode;
-string g_p_SetUnhandledExceptionFilter_Opcode;
-
 
 BOOL InjectDllByPid(DWORD dwPid, HMODULE hKernelRemote, HMODULE hNtdllRemote, wstring szdllName)
 {
@@ -71,7 +68,7 @@ BOOL tryInjectByPid(DWORD dwProcId)
 		{
 			tstring module_name = iter->szModule;
 			std::transform(module_name.begin(), module_name.end(), module_name.begin(), ::tolower);
-			if (module_name == _T("libtiktok.dll"))
+			if (module_name == _T("tiktok.dll"))
 			{
 				bFindDll = TRUE;
 			}
@@ -88,7 +85,7 @@ BOOL tryInjectByPid(DWORD dwProcId)
 	}
 	if (!bFindDll && hKernel && kNtdll)
 	{
-		return InjectDllByPid(dwProcId, hKernel, kNtdll, L"libtiktok.dll");
+		return InjectDllByPid(dwProcId, hKernel, kNtdll, L"tiktok.dll");
 	}
 
 	return bFindDll;

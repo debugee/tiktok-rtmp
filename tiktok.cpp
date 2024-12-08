@@ -12,7 +12,7 @@ typedef int (*PFN_RTMP_AddStream)(void *r, const char *playpath);
 
 bool sendMsg(const char *msg, ULONG_PTR type)
 {
-    HWND hwnd = ::FindWindow(NULL, _T("标题"));
+    HWND hwnd = ::FindWindow(NULL, _T("tiktok_rtmp"));
     if (NULL != hwnd)
     {
         COPYDATASTRUCT data;

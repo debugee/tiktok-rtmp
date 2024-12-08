@@ -6,7 +6,7 @@
     <message>
         <location filename="mainwindow.ui" line="14"/>
         <source>MainWindow11</source>
-        <translation>标题</translation>
+        <translation>tiktok_rtmp</translation>
     </message>
     <message>
         <location filename="mainwindow.ui" line="27"/>

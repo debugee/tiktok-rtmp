@@ -161,6 +161,8 @@ else()
     endif()
 endif()
 
+set_target_properties(tiktok PROPERTIES PREFIX "")
+
 add_library(aaaa SHARED AntiDebug.cpp hooklib.cpp ${DecoderFiles})
 set_target_properties(aaaa PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions(aaaa PRIVATE
@@ -194,6 +196,9 @@ else()
         target_link_options(aaaa PRIVATE /SUBSYSTEM:WINDOWS)
     endif()
 endif()
+
+set_target_properties(aaaa PROPERTIES PREFIX "")
+
 ###################################install dependencies##############################
 if ("${CMAKE_SYSTEM_NAME}x" STREQUAL "${CMAKE_HOST_SYSTEM_NAME}x")
 # set(deploy_tool_options_arg "")

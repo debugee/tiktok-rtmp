@@ -1,8 +1,7 @@
 #include "AntiDebug.h"
-#include "hooklib.h"
-#include <atlstr.h>
 #include <vector>
 #include <sstream>
+#include "hooklib.h"
 
 
 static HOOK_INFO hkInfo;
@@ -29,8 +28,8 @@ LONG WINAPI pfnZwSetInformationThread(IN HANDLE ThreadHandle,
 BOOL AntiDebug()
 {
     FARPROC pfnSetInformationThread = GetProcAddress(LoadLibraryA("ntdll.dll"), "ZwSetInformationThread");
-    HookByAddress(pfnSetInformationThread, &hkInfo,
-                  &pfnZwSetInformationThread);
+    HookByAddress((void *)pfnSetInformationThread, &hkInfo,
+                  (void *)&pfnZwSetInformationThread);
 
     return TRUE;
 }
