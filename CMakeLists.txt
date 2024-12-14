@@ -69,11 +69,13 @@ if(WIN32)
         BX_STANDALONE_DECODER
         BX_INSTR_STORE_OPCODE_BYTES
     )
-    if (MINGW)
+
+    if(MINGW)
         target_sources(untitled1 PRIVATE untitled.rc)
     else()
         set_target_properties(untitled1 PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\"")
     endif()
+
     target_link_libraries(untitled1 PRIVATE shlwapi.lib)
 endif()
 
@@ -108,9 +110,7 @@ qt_add_resources(untitled1 "ts"
     BASE "${CMAKE_CURRENT_BINARY_DIR}"
     FILES ${QM_FILES})
 
-
 target_compile_definitions(untitled1 PRIVATE $<$<CONFIG:Release>:QT_NO_DEBUG_OUTPUT>)
-
 
 # set(CODE_SIGN_IDENTITY "Apple Development: Wen Cheng (Y9UU5S8ZW7)")
 # find_program(DEPLOY macdeployqt6)
@@ -122,7 +122,7 @@ target_compile_definitions(untitled1 PRIVATE $<$<CONFIG:Release>:QT_NO_DEBUG_OUT
 
 # target_link_options(untitled1 PRIVATE -ld_classic)
 
-#################tiktok################
+# ################tiktok################
 set(_unicode TRUE)
 set(_console FALSE)
 
@@ -136,7 +136,7 @@ target_compile_definitions(tiktok PRIVATE
     BX_INSTR_STORE_OPCODE_BYTES
 )
 
-if (MINGW)
+if(MINGW)
     target_link_libraries(tiktok PRIVATE libwinpthread.a libc++.a libunwind.a)
     target_link_options(tiktok PRIVATE -Wl,--pdb=)
 else()
@@ -145,7 +145,8 @@ endif()
 
 if(_unicode)
     target_compile_definitions(tiktok PRIVATE UNICODE _UNICODE)
-    if (MINGW)
+
+    if(MINGW)
         target_link_options(tiktok PRIVATE -municode)
     endif()
 endif()
@@ -154,7 +155,8 @@ if(_console)
     target_compile_definitions(tiktok PRIVATE _CONSOLE)
 else()
     target_compile_definitions(tiktok PRIVATE _WINDOWS)
-    if (MINGW)
+
+    if(MINGW)
         target_link_options(tiktok PRIVATE -mwindows)
     else()
         target_link_options(tiktok PRIVATE /SUBSYSTEM:WINDOWS)
@@ -163,7 +165,11 @@ endif()
 
 set_target_properties(tiktok PROPERTIES PREFIX "")
 
-add_library(aaaa SHARED AntiDebug.cpp hooklib.cpp ${DecoderFiles})
+target_compile_options(tiktok PRIVATE "$<$<C_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+
+target_compile_options(tiktok PRIVATE "$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+
+add_library(aaaa SHARED antidebug.cpp hooklib.cpp ${DecoderFiles})
 set_target_properties(aaaa PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_compile_definitions(aaaa PRIVATE
     $<$<CONFIG:Debug>:_DEBUG>
@@ -172,7 +178,7 @@ target_compile_definitions(aaaa PRIVATE
     BX_INSTR_STORE_OPCODE_BYTES
 )
 
-if (MINGW)
+if(MINGW)
     target_link_libraries(aaaa PRIVATE libwinpthread.a libc++.a libunwind.a)
     target_link_options(aaaa PRIVATE -Wl,--pdb=)
 else()
@@ -181,7 +187,8 @@ endif()
 
 if(_unicode)
     target_compile_definitions(aaaa PRIVATE UNICODE _UNICODE)
-    if (MINGW)
+
+    if(MINGW)
         target_link_options(aaaa PRIVATE -municode)
     endif()
 endif()
@@ -190,7 +197,8 @@ if(_console)
     target_compile_definitions(aaaa PRIVATE _CONSOLE)
 else()
     target_compile_definitions(aaaa PRIVATE _WINDOWS)
-    if (MINGW)
+
+    if(MINGW)
         target_link_options(aaaa PRIVATE -mwindows)
     else()
         target_link_options(aaaa PRIVATE /SUBSYSTEM:WINDOWS)
@@ -199,22 +207,61 @@ endif()
 
 set_target_properties(aaaa PROPERTIES PREFIX "")
 
-###################################install dependencies##############################
-if ("${CMAKE_SYSTEM_NAME}x" STREQUAL "${CMAKE_HOST_SYSTEM_NAME}x")
-# set(deploy_tool_options_arg "")
-# if(APPLE)
-#     set(deploy_tool_options_arg --hardened-runtime)
-# elseif(WIN32)
-#     set(deploy_tool_options_arg --no-compiler-runtime)
-# endif()
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-set(deploy_tool_options_arg --no-compiler-runtime)
+target_compile_options(aaaa PRIVATE "$<$<C_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+
+target_compile_options(aaaa PRIVATE "$<$<CXX_COMPILER_ID:MSVC>:/source-charset:utf-8>")
+
+add_executable(epinject
+    epinject.cpp
+    charset.cpp
+    winprocess.cpp
+    process.cpp
+    injectlib.cpp
+    ${DecoderFiles}
+)
+
+target_compile_definitions(epinject PRIVATE
+    $<$<CONFIG:Debug>:_DEBUG>
+    UNICODE
+    _UNICODE
+    BX_STANDALONE_DECODER
+    BX_INSTR_STORE_OPCODE_BYTES
+)
+
+if(MINGW)
+    target_link_libraries(epinject PRIVATE libwinpthread.a libc++.a libunwind.a)
+    target_link_options(epinject PRIVATE -Wl,--pdb=)
+else()
+    set_target_properties(epinject PROPERTIES MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
-# Generate a deployment script to be executed at install time
-qt_generate_deploy_script(
-    TARGET untitled1
-    OUTPUT_SCRIPT deploy_script
-    CONTENT "
+
+if(_unicode)
+    target_compile_definitions(epinject PRIVATE UNICODE _UNICODE)
+
+    if(MINGW)
+        target_link_options(epinject PRIVATE -municode)
+    endif()
+endif()
+
+target_compile_definitions(epinject PRIVATE _CONSOLE)
+
+# ##################################install dependencies##############################
+if("${CMAKE_SYSTEM_NAME}x" STREQUAL "${CMAKE_HOST_SYSTEM_NAME}x")
+    # set(deploy_tool_options_arg "")
+    # if(APPLE)
+    # set(deploy_tool_options_arg --hardened-runtime)
+    # elseif(WIN32)
+    # set(deploy_tool_options_arg --no-compiler-runtime)
+    # endif()
+    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+        set(deploy_tool_options_arg --no-compiler-runtime)
+    endif()
+
+    # Generate a deployment script to be executed at install time
+    qt_generate_deploy_script(
+        TARGET untitled1
+        OUTPUT_SCRIPT deploy_script
+        CONTENT "
 qt_deploy_runtime_dependencies(
     EXECUTABLE \"$<TARGET_FILE:untitled1>\"
     DEPLOY_TOOL_OPTIONS \"${deploy_tool_options_arg}\"
@@ -222,15 +269,15 @@ qt_deploy_runtime_dependencies(
     VERBOSE
 )")
 
-install(SCRIPT ${deploy_script})
+    install(SCRIPT ${deploy_script})
 endif()
 
-install(TARGETS tiktok aaaa)
-# install(TARGETS tiktok
-#     RUNTIME_DEPENDENCIES
-#     PRE_EXCLUDE_REGEXES "^ext.+\\.dll" "^api.+\\.dll"
-#     POST_EXCLUDE_REGEXES ".*system32/.*\\.dll" ".*syswow64/.*\\.dll"
-#     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-# )
+install(TARGETS tiktok aaaa epinject)
 
+# install(TARGETS tiktok
+# RUNTIME_DEPENDENCIES
+# PRE_EXCLUDE_REGEXES "^ext.+\\.dll" "^api.+\\.dll"
+# POST_EXCLUDE_REGEXES ".*system32/.*\\.dll" ".*syswow64/.*\\.dll"
+# RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+# )
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/librtmp.dll DESTINATION ${CMAKE_INSTALL_BINDIR})
